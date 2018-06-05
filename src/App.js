@@ -7,59 +7,84 @@ import './App.css';
 import { ToastContainer, toast } from 'react-toastify';
 
 class App extends Component {
-  constructor( props ) {
-    super( props );
+  constructor(props) {
+    super(props);
 
     this.state = {
       vehiclesToDisplay: [],
-      buyersToDisplay: []
+      buyersToDisplay: [],
+      baseUrl: 'https://joes-autos.herokuapp.com'
     };
 
-    this.getVehicles = this.getVehicles.bind( this );
-    this.getPotentialBuyers = this.getPotentialBuyers.bind( this );
-    this.sellCar = this.sellCar.bind( this );
-    this.addCar = this.addCar.bind( this );
-    this.filterByColor = this.filterByColor.bind( this );
-    this.filterByMake = this.filterByMake.bind( this );
-    this.addBuyer = this.addBuyer.bind( this );
-    this.nameSearch = this.nameSearch.bind( this );
-    this.resetData = this.resetData.bind( this );
-    this.byYear = this.byYear.bind( this );
-    this.deleteBuyer = this.deleteBuyer.bind( this );
+    this.getVehicles = this.getVehicles.bind(this);
+    this.getPotentialBuyers = this.getPotentialBuyers.bind(this);
+    this.sellCar = this.sellCar.bind(this);
+    this.addCar = this.addCar.bind(this);
+    this.filterByColor = this.filterByColor.bind(this);
+    this.filterByMake = this.filterByMake.bind(this);
+    this.addBuyer = this.addBuyer.bind(this);
+    this.nameSearch = this.nameSearch.bind(this);
+    this.resetData = this.resetData.bind(this);
+    this.byYear = this.byYear.bind(this);
+    this.deleteBuyer = this.deleteBuyer.bind(this);
+  }
+
+  componentDidMount() {
+    axios.get(`${this.state.baseUrl}/api/vehicles`)
+      .then(vehicles => {
+        this.setState({ vehiclesToDisplay: vehicles.data })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   getVehicles() {
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
+    axios.get(`${this.state.baseUrl}/api/vehicles`)
+      .then(vehicles => {
+        toast.success('Success')
+        this.setState({ vehiclesToDisplay: vehicles.data })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   getPotentialBuyers() {
-    // axios (GET)
-    // setState with response -> buyersToDisplay
+    axios.get(`${this.state.baseUrl}/api/buyers`)
+      .then(buyers => {
+        toast.success('Success')
+        this.setState({ buyersToDisplay: buyers.data })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
-  sellCar( id ) {
-    // axios (DELETE)
-    // setState with response -> vehiclesToDisplay
+  sellCar(id) {
+    axios.delete(`${this.state.baseUrl}/api/vehicles/${id}`)
+      .then(response => {
+        toast.success('Success');
+        this.setState({ vehiclesToDisplay: response.data.vehicles })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   filterByMake() {
     let make = this.refs.selectedMake.value;
 
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
+    axios.get(`${this.state.baseUrl}/api/vehicles?make=${make}`)
+      .then(response => this.setState({ vehiclesToDisplay: response.data }))
   }
 
   filterByColor() {
     let color = this.refs.selectedColor.value;
 
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
+    axios.get(`${this.state.baseUrl}/api/vehicles?color=${color}`)
+      .then(response => this.setState({ vehiclesToDisplay: response.data }))
   }
 
-  updatePrice( priceChange, id ) {
-    // axios (PUT)
-    // setState with response -> vehiclesToDisplay
+  updatePrice(priceChange, id) {
+    axios.put(`${this.state.baseUrl}/api/vehicles/${id}/${priceChange}`)
+      .then(response => {
+        toast.success('Success');
+        this.setState({ vehiclesToDisplay: response.data.vehicles })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   addCar() {
@@ -71,44 +96,56 @@ class App extends Component {
       price: this.refs.price.value
     };
 
-    // axios (POST)
-    // setState with response -> vehiclesToDisplay
+    axios.post(`${this.state.baseUrl}/api/vehicles`, newCar)
+      .then(response => {
+        toast.success('Success');
+        this.setState({ vehiclesToDisplay: response.data.vehicles })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   addBuyer() {
-    let newBuyer ={
+    let newBuyer = {
       name: this.refs.name.value,
       phone: this.refs.phone.value,
       address: this.refs.address.value
     };
 
-    //axios (POST)
-    // setState with response -> buyersToDisplay
+    axios.post(`${this.state.baseUrl}/api/buyers`, newBuyer)
+      .then(response => {
+        toast.success('Success');
+        this.setState({ buyersToDisplay: response.data.buyers })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
-  deleteBuyer( id ) {
-    // axios (DELETE)
-    //setState with response -> buyersToDisplay
+  deleteBuyer(id) {
+    axios.delete(`${this.state.baseUrl}/api/buyers?id=${id}`)
+      .then(response => {
+        toast.success('Success');
+        this.setState({ buyersToDisplay: response.data.buyers })
+      })
+      .catch(err => toast.error('Failed'))
   }
 
   nameSearch() {
     let searchLetters = this.refs.searchLetters.value;
 
-    // axios (GET)
-    // setState with response -> buyersToDisplay
+    axios.get(`${this.state.baseUrl}/api/vehicles?make=${searchLetters}`)
+      .then(response => this.setState({ vehiclesToDisplay: response.data }))
   }
 
   byYear() {
     let year = this.refs.searchYear.value;
 
-    // axios (GET)
-    // setState with response -> vehiclesToDisplay
+    axios.get(`${this.state.baseUrl}/api/vehicles?year=${year}`)
+      .then(response => this.setState({ vehiclesToDisplay: response.data }))
   }
 
   // Do not edit the code below
-  resetData( dataToReset ) {
-    axios.get('https://joes-autos.herokuapp.com/api/' + dataToReset + '/reset').then( res => {
-      if ( dataToReset === 'vehicles' ) {
+  resetData(dataToReset) {
+    axios.get('https://joes-autos.herokuapp.com/api/' + dataToReset + '/reset').then(res => {
+      if (dataToReset === 'vehicles') {
         this.setState({ vehiclesToDisplay: res.data.vehicles });
       } else {
         this.setState({ buyersToDisplay: res.data.buyers });
@@ -118,80 +155,80 @@ class App extends Component {
   // Do not edit the code above
 
   render() {
-    const vehicles = this.state.vehiclesToDisplay.map( v => {
+    const vehicles = this.state.vehiclesToDisplay.map(v => {
       return (
-        <div key={ v.id }>
-          <p>Make: { v.make }</p>
-          <p>Model: { v.model }</p>
-          <p>Year: { v.year }</p>
-          <p>Color: { v.color }</p>
-          <p>Price: { v.price }</p>
+        <div key={v.id}>
+          <p>Make: {v.make}</p>
+          <p>Model: {v.model}</p>
+          <p>Year: {v.year}</p>
+          <p>Color: {v.color}</p>
+          <p>Price: {v.price}</p>
 
           <button className='btn btn-sp'
-                  onClick={ () => this.updatePrice( 'up', v.id ) }>
+            onClick={() => this.updatePrice('up', v.id)}>
             Increase Price
           </button>
 
           <button className='btn btn-sp'
-                  onClick={ () => this.updatePrice( 'down', v.id ) }>
+            onClick={() => this.updatePrice('down', v.id)}>
             Decrease Price
           </button>
 
           <button className='btn btn-sp'
-                  onClick={ () => this.sellCar( v.id ) }>
+            onClick={() => this.sellCar(v.id)}>
             SOLD!
           </button>
-          
+
           <hr className='hr' />
-        </div> 
+        </div>
       )
     });
 
-    const buyers = this.state.buyersToDisplay.map( person => {
+    const buyers = this.state.buyersToDisplay.map(person => {
       return (
-        <div key={ person.id }>
-          <p>Name: { person.name }</p>
-          <p>Phone: { person.phone }</p>
-          <p>Address: { person.address }</p>
+        <div key={person.id}>
+          <p>Name: {person.name}</p>
+          <p>Phone: {person.phone}</p>
+          <p>Address: {person.address}</p>
 
-          <button className='btn' 
-                  onClick={ () => { this.deleteBuyer( person.id ) } }>
+          <button className='btn'
+            onClick={() => { this.deleteBuyer(person.id) }}>
             No longer interested
           </button>
 
           <hr className='hr' />
-        </div> 
+        </div>
       )
     });
 
     return (
       <div className=''>
         <ToastContainer />
-        
+
         <header className='header'>
-          <img src={ logo } alt=""/>
+          <img src={logo} alt="" />
 
           <button className="header-btn1 btn"
-                  onClick={ () => this.resetData( 'vehicles' ) }>
+            onClick={() => this.resetData('vehicles')}>
             Reset Vehicles
           </button>
 
           <button className='header-btn2 btn'
-                  onClick={ () => this.resetData( 'buyers' ) }>
+            onClick={() => this.resetData('buyers')}>
             Reset Buyers
           </button>
         </header>
 
         <div className='btn-container'>
-          <button className='btn-sp btn' 
-                  onClick={ this.getVehicles }>
+          <button className='btn-sp btn'
+            onClick={this.getVehicles}>
             Get All Vehicles
           </button>
 
-          <select onChange={ this.filterByMake }
-                  ref='selectedMake'
-                  className='btn-sp'
-                  value="">
+          <select onChange={this.filterByMake}
+            ref='selectedMake'
+            className='btn-sp'
+            value="">
             <option value="" disabled>Filter by make</option>
             <option value="Suzuki">Suzuki</option>
             <option value="GMC">GMC</option>
@@ -205,9 +242,9 @@ class App extends Component {
           </select>
 
           <select ref='selectedColor'
-                  onChange={ this.filterByColor }
-                  className='btn-sp'
-                  value="">
+            onChange={this.filterByColor}
+            className='btn-sp'
+            value="">
             <option value="" disabled>Filter by color</option>
             <option value="red">Red</option>
             <option value="green">Green</option>
@@ -217,26 +254,26 @@ class App extends Component {
             <option value="teal">Teal</option>
           </select>
 
-          <input  onChange={ this.nameSearch }
-                  placeholder='Search by name'
-                  type="text"
-                  ref='searchLetters' />
+          <input onChange={this.nameSearch}
+            placeholder='Search by name'
+            type="text"
+            ref='searchLetters' />
 
-           <input ref='searchYear'
-                  className='btn-sp'
-                  type='number'
-                  placeholder='Year' />
+          <input ref='searchYear'
+            className='btn-sp'
+            type='number'
+            placeholder='Year' />
 
-          <button onClick={ this.byYear }
-                  className='btn-inp'>
+          <button onClick={this.byYear}
+            className='btn-inp'>
             Go
           </button>
 
           <button className='btn-sp btn'
-                  onClick={ this.getPotentialBuyers }>
+            onClick={this.getPotentialBuyers}>
             Get Potential Buyers
           </button>
-        </div> 
+        </div>
 
         <br />
 
@@ -248,7 +285,7 @@ class App extends Component {
           <input type='number' className='btn-sp' placeholder='price' ref='price' />
 
           <button className='btn-sp btn'
-                  onClick={ this.addCar }>
+            onClick={this.addCar}>
             Add vehicle
           </button>
         </p>
@@ -258,23 +295,23 @@ class App extends Component {
           <input className='btn-sp' placeholder='phone' ref='phone' />
           <input className='btn-sp' placeholder='address' ref='address' />
 
-          <button onClick={ this.addBuyer }
-                  className='btn-sp btn' >
+          <button onClick={this.addBuyer}
+            className='btn-sp btn' >
             Add buyer
           </button>
         </p>
-        
+
         <main className='main-wrapper'>
-          <section className='info-box'> 
+          <section className='info-box'>
             <h3>Inventory</h3>
 
-            { vehicles }
+            {vehicles}
           </section>
 
           <section className='info-box'>
             <h3>Potential Buyers</h3>
 
-            { buyers }
+            {buyers}
           </section>
         </main>
       </div>

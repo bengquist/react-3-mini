@@ -120,7 +120,7 @@ class App extends Component {
   }
 
   deleteBuyer(id) {
-    axios.delete(`${this.state.baseUrl}/api/buyers?id=${id}`)
+    axios.delete(`${this.state.baseUrl}/api/buyers/${id}`)
       .then(response => {
         toast.success('Success');
         this.setState({ buyersToDisplay: response.data.buyers })
